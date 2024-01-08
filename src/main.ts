@@ -1,10 +1,14 @@
-import {Application, Graphics} from "pixi.js";
-import {Port} from "./models/Port.ts";
-import {BOAT_GAP, BOAT_GEN_TIME, PIER_GAP, PIER_LOAD_TIME, PIERS_COUNT, pos, WALLS} from "./settings.ts";
-import {Boat, BoatFactory} from "./models/Boat.ts";
-import {EColor, TWallSetting} from "./types";
-import {percentsToCoords} from "./helpers";
-import {Pier} from "./models/Pier.ts";
+import {Application, Graphics} from "pixi.js"
+import { Port, TQueueType } from './models/Port.ts'
+import {BOAT_GAP, BOAT_GEN_TIME, PIER_GAP, PIER_LOAD_TIME, PIERS_COUNT, pos, WALLS} from "./settings.ts"
+import {Boat, BoatFactory} from "./models/Boat.ts"
+import {EColor, TWallSetting} from "./types"
+import {percentsToCoords} from "./helpers"
+import {Pier} from "./models/Pier.ts"
+
+function pause(time: number) {
+    return new Promise((resolve) => setTimeout(resolve, time))
+}
 
 class Game {
     private _port = new Port()
@@ -38,7 +42,9 @@ class Game {
 
     generateBoat() {
         const capacity = this.getRandomPierCapacity()
-        const boat = Math.random() > 0.5 ? BoatFactory.getRedBoat(capacity) : BoatFactory.getGreenBoat(capacity)
+        const boat = Math.random() > 0.5
+            ? BoatFactory.getRedBoat(capacity)
+            : BoatFactory.getGreenBoat(capacity)
         boat.position.set(...percentsToCoords(this._app,pos['boat']))
         this._app.stage.addChild(boat)
 
@@ -46,7 +52,7 @@ class Game {
     }
 
     private getRandomPierCapacity() {
-        return this._port.getPiers()[~~(Math.random() * PIERS_COUNT)].capacity;
+        return this._port.getPiers()[~~(Math.random() * PIERS_COUNT)].capacity
     }
 
     renderPiers() {
@@ -85,7 +91,7 @@ class Game {
         const boatPier = this._port.findPier(boat)
 
         if (boatPier) {
-            this.moveBoatToTarget(boat, boatPier);
+            this.moveBoatToTarget(boat, boatPier)
         } else {
             this.moveToQueue(boat)
         }
@@ -95,17 +101,17 @@ class Game {
         boat.setTarget(boatPier.x, boatPier.y)
         boatPier.book()
 
-        const moveAsync = async () => {
-            const coordinates = this.getWallCoordinates();
-            const moved = boat.move(coordinates);
+        const move = async () => {
+            const coordinates = this.getWallCoordinates()
+            const moved = boat.move(coordinates)
 
             if (moved) {
-                await new Promise(resolve => setTimeout(resolve, PIER_LOAD_TIME));
-                this.processBoat(boat, boatPier);
+                await pause(PIER_LOAD_TIME)
+                this.processBoat(boat, boatPier)
             }
-        };
+        }
 
-        this._app.ticker.add(moveAsync)
+        this._app.ticker.add(move)
     }
 
     private processBoat(boat: Boat, boatPier: Pier) {
@@ -126,15 +132,18 @@ class Game {
         this._port.bookQueue(type)
 
         boat.setTarget(x + (queStat[type] * BOAT_GAP),y)
-        const k = () => {
-            const isFinished = boat.move(this.getWallCoordinates());
-            isFinished && this._port.moveToQueue(boat);
-            isFinished && this._app.ticker.remove(k)
-        };
-        this._app.ticker.add(k)
+        const move = () => {
+            const isFinished = boat.move(this.getWallCoordinates())
+
+            if (isFinished) {
+                this._port.moveToQueue(boat)
+                this._app.ticker.remove(move)
+            }
+        }
+        this._app.ticker.add(move)
     }
 
-    private processQueue(type: "load" | "release") {
+    private processQueue(type: TQueueType) {
         const boat = this._port.firstBoatInQueue(type)
 
         if(!boat) return
@@ -142,7 +151,7 @@ class Game {
         const boatPier = this._port.findPier(boat)
 
         if (boatPier) {
-            this.moveBoatToTarget(boat, boatPier);
+            this.moveBoatToTarget(boat, boatPier)
             this._port.removeFirstBoatInQueue(type)
         }
     }
