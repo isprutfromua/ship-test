@@ -1,10 +1,11 @@
 import { Application, Graphics } from 'pixi.js';
-import { Port, TQueueType } from './models/Port.ts';
+import { Port } from './models/Port.ts';
 import { BOAT_GAP, BOAT_GEN_TIME, PIER_GAP, PIER_LOAD_TIME, PIERS_COUNT, pos, WALLS } from './settings.ts';
 import { Boat, BoatFactory } from './models/Boat.ts';
 import { EColor, TWallSetting } from './types';
 import { pause, percentsToCoords } from './helpers';
 import { Pier } from './models/Pier.ts';
+import { TQueueType } from './models/BoatQueue.ts';
 
 class Game {
     private _port = new Port();
