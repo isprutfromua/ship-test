@@ -95,13 +95,17 @@ class Game {
         boat.setTarget(boatPier.x, boatPier.y)
         boatPier.book()
 
-        const moveBoatToPier = () => {
-            boat.move(this.getWallCoordinates()) && setTimeout(() => {
-                this.processBoat(boat, boatPier)
-            }, PIER_LOAD_TIME)
-        }
+        const moveAsync = async () => {
+            const coordinates = this.getWallCoordinates();
+            const moved = boat.move(coordinates);
 
-        this._app.ticker.add(moveBoatToPier)
+            if (moved) {
+                await new Promise(resolve => setTimeout(resolve, PIER_LOAD_TIME));
+                this.processBoat(boat, boatPier);
+            }
+        };
+
+        this._app.ticker.add(moveAsync)
     }
 
     private processBoat(boat: Boat, boatPier: Pier) {
@@ -122,10 +126,12 @@ class Game {
         this._port.bookQueue(type)
 
         boat.setTarget(x + (queStat[type] * BOAT_GAP),y)
-        this._app.ticker.add(() => {
-            const isFinished = boat.move(this.getWallCoordinates())
-            isFinished && this._port.moveToQueue(boat)
-        })
+        const k = () => {
+            const isFinished = boat.move(this.getWallCoordinates());
+            isFinished && this._port.moveToQueue(boat);
+            isFinished && this._app.ticker.remove(k)
+        };
+        this._app.ticker.add(k)
     }
 
     private processQueue(type: "load" | "release") {

@@ -79,9 +79,9 @@ export class Boat extends Sprite implements IBoat {
         const directionX = this._target.x - this.position.x;
         const directionY = this._target.y - this.position.y;
 
-        if (!isCloseEnoughX && this.canMoveHorizontally(obstacles)) {
+        if (!isCloseEnoughX) {
             this.position.x = this.position.x + (directionX > 0 ? this._speed : -this._speed);
-        } else if (!isCloseEnoughY && this.canMoveVertically(obstacles)) {
+        } else if (!isCloseEnoughY) {
             this.position.y = this.position.y + (directionY > 0 ? this._speed : -this._speed);
         }
     }
