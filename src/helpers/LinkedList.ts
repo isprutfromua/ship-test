@@ -1,10 +1,10 @@
 class ListNode<T> {
-    value: T
-    next: ListNode<T> | null
+    value: T;
+    next: ListNode<T> | null;
 
     constructor(node: T) {
-        this.value = node
-        this.next = null
+        this.value = node;
+        this.next = null;
     }
 }
 
@@ -17,23 +17,25 @@ interface ILinkedList<T> {
 }
 
 export class LinkedList<T> implements ILinkedList<T> {
-    constructor(private _head: ListNode<T> | null = null, private _tail: ListNode<T> | null = null) {
-    }
+    constructor(
+        private _head: ListNode<T> | null = null,
+        private _tail: ListNode<T> | null = null,
+    ) {}
 
     add(val: T) {
-        const node = new ListNode<T>(val)
+        const node = new ListNode<T>(val);
 
         if (!this._head) {
-            this._head = node
-            this._tail = node
+            this._head = node;
+            this._tail = node;
         } else {
-            this._tail!.next = node
-            this._tail = node
+            this._tail!.next = node;
+            this._tail = node;
         }
     }
 
     get head(): T | undefined {
-        return this._head?.value
+        return this._head?.value;
     }
 
     unshift(): T | undefined {
@@ -41,9 +43,9 @@ export class LinkedList<T> implements ILinkedList<T> {
             const val = this._head?.value;
             this._head = this._head.next;
 
-            return val
+            return val;
         } else {
-            return undefined
+            return undefined;
         }
     }
 }

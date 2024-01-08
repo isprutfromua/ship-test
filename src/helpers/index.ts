@@ -11,9 +11,8 @@ export function genPiers() {
     return piers;
 }
 export function percentsToCoords(app: Application, percents: [x: number, y: number]): [x: number, y: number] {
-    return [~~((app.view.width / 100) * percents[0]), ~~((app.view.height / 100) * percents[1])]
+    return [~~((app.view.width / 100) * percents[0]), ~~((app.view.height / 100) * percents[1])];
 }
-
 export function pause(time: number) {
     return new Promise((resolve) => setTimeout(resolve, time));
 }

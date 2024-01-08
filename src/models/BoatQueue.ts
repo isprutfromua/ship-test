@@ -22,8 +22,8 @@ export class BoatQueue extends LinkedList<Boat> {
 
 export type TQueueType = 'load' | 'release';
 export type TQueuesMap = {
-    [key in TQueueType]: BoatQueue
-}
+    [key in TQueueType]: BoatQueue;
+};
 export type TBoatQueuesStats = {
-    [key in TQueueType]: number
-}
+    [key in TQueueType]: number;
+};
